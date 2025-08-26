@@ -1181,24 +1181,37 @@ const FileLinksSection: React.FC<{ files: FileLink[] }> = ({ files }) => {
   );
 };
 
-const SuggestionsSection: React.FC<{ 
-  suggestions: string[]; 
+const SuggestionsSection: React.FC<{
+  suggestions: string[];
   onSuggestionClick: (suggestion: string) => void;
 }> = ({ suggestions, onSuggestionClick }) => {
+  const [clickedSuggestions, setClickedSuggestions] = useState<Set<string>>(new Set());
+
+  const handleSuggestionClick = (suggestion: string) => {
+    // Mark this suggestion as clicked
+    setClickedSuggestions(prev => new Set(prev.add(suggestion)));
+    // Call the original click handler
+    onSuggestionClick(suggestion);
+  };
+
   return (
     <div className="mt-6">
-      <h5 className="font-semibold text-gray-800 mb-2 px-4">Suggested Questions</h5>
-      {suggestions.map((suggestion, index) => (
-        <button
-          key={index}
-          onClick={() => onSuggestionClick(suggestion)}
-          className="suggestion-button flex items-center justify-between w-full text-left p-4 my-2 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-700 shadow-sm hover:bg-gray-100">
-          <span>{suggestion}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-gray-400">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-        </button>
-      ))}
+      <h5 className="font-semibold text-gray-800 mb-3 px-4">Suggested Questions</h5>
+      <div className="px-4">
+        {suggestions.map((suggestion, index) => (
+          <button
+            key={index}
+            onClick={() => handleSuggestionClick(suggestion)}
+            className={`suggestion-button flex items-center justify-between w-full text-left text-sm ${
+              clickedSuggestions.has(suggestion) ? 'clicked' : 'text-gray-700'
+            }`}>
+            <span>{suggestion}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
