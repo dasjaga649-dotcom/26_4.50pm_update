@@ -148,6 +148,129 @@ function App() {
     }
   ];
 
+  const generateMockResponse = (query: string): BotResponse => {
+    const lowerQuery = query.toLowerCase();
+
+    // CEO/Founder questions
+    if (lowerQuery.includes('ceo') || lowerQuery.includes('founder')) {
+      return {
+        answer: "Hutech Solutions was founded by **John Smith** in 2015. He serves as our CEO and has over 15 years of experience in technology solutions. Under his leadership, we've grown to become a leading provider of innovative tech services.",
+        recommendations: [
+          "What is the company history?",
+          "Tell me about the leadership team",
+          "What is the company mission?"
+        ],
+        related_content: [
+          {
+            title: "About Our Leadership",
+            url: "https://hutechsolutions.com/about/leadership"
+          }
+        ]
+      };
+    }
+
+    // Office locations
+    if (lowerQuery.includes('office') || lowerQuery.includes('location')) {
+      return {
+        answer: "Hutech Solutions has offices in multiple locations:\n\n**Main Headquarters:**\n- San Francisco, CA\n- 123 Tech Boulevard, Suite 500\n\n**Regional Offices:**\n- New York, NY\n- Austin, TX\n- Seattle, WA\n\nAll offices are equipped with modern facilities and collaborative workspaces.",
+        recommendations: [
+          "Can I book a consultation at one of our office locations?",
+          "What services are available at our different offices?",
+          "How can I get directions to a specific office?"
+        ],
+        related_content: [
+          {
+            title: "Office Locations & Contact Info",
+            url: "https://hutechsolutions.com/locations"
+          }
+        ]
+      };
+    }
+
+    // Services
+    if (lowerQuery.includes('service') || lowerQuery.includes('what do you do')) {
+      return {
+        answer: "Hutech Solutions provides comprehensive technology services including:\n\n🔧 **Software Development**\n- Custom web applications\n- Mobile app development\n- Enterprise software solutions\n\n☁️ **Cloud Services**\n- Cloud migration\n- Infrastructure management\n- DevOps solutions\n\n🔒 **Cybersecurity**\n- Security audits\n- Threat protection\n- Compliance solutions\n\n📊 **Data Analytics**\n- Business intelligence\n- Data visualization\n- Machine learning solutions",
+        recommendations: [
+          "What technologies do you specialize in?",
+          "Do you offer consulting services?",
+          "What industries do you serve?"
+        ]
+      };
+    }
+
+    // Industries
+    if (lowerQuery.includes('industr')) {
+      return {
+        answer: "Hutech Solutions serves clients across various industries:\n\n🏥 **Healthcare** - Patient management systems, telemedicine platforms\n🏦 **Financial Services** - Banking solutions, payment processing\n🏭 **Manufacturing** - IoT solutions, supply chain management\n🛒 **E-commerce** - Online platforms, inventory management\n🎓 **Education** - Learning management systems, virtual classrooms\n🏛️ **Government** - Digital transformation, citizen services",
+        recommendations: [
+          "Do you have experience with healthcare compliance?",
+          "What e-commerce platforms do you work with?",
+          "Can you help with digital transformation?"
+        ]
+      };
+    }
+
+    // Contact information
+    if (lowerQuery.includes('contact') || lowerQuery.includes('phone') || lowerQuery.includes('email')) {
+      return {
+        answer: "**Contact Hutech Solutions:**\n\n📞 **Phone:** +1 (555) 123-4567\n📧 **Email:** info@hutechsolutions.com\n🌐 **Website:** www.hutechsolutions.com\n\n**Business Hours:**\nMonday - Friday: 9:00 AM - 6:00 PM PST\nSaturday: 10:00 AM - 4:00 PM PST\nSunday: Closed\n\n**Emergency Support:** Available 24/7 for enterprise clients",
+        recommendations: [
+          "How can I schedule a consultation?",
+          "Do you offer 24/7 support?",
+          "What is your response time for inquiries?"
+        ]
+      };
+    }
+
+    // Tech stack
+    if (lowerQuery.includes('tech stack') || lowerQuery.includes('technology') || lowerQuery.includes('technologies')) {
+      return {
+        answer: "**Our Technology Stack:**\n\n**Frontend:**\n- React, Vue.js, Angular\n- TypeScript, JavaScript\n- HTML5, CSS3, Tailwind CSS\n\n**Backend:**\n- Node.js, Python, Java\n- Express.js, Django, Spring Boot\n- REST APIs, GraphQL\n\n**Databases:**\n- PostgreSQL, MongoDB, MySQL\n- Redis, Elasticsearch\n\n**Cloud & DevOps:**\n- AWS, Azure, Google Cloud\n- Docker, Kubernetes\n- CI/CD pipelines, Jenkins",
+        recommendations: [
+          "Do you work with specific frameworks?",
+          "What cloud platforms do you prefer?",
+          "Do you offer training on these technologies?"
+        ]
+      };
+    }
+
+    // Stats
+    if (lowerQuery.includes('stats') || lowerQuery.includes('statistics') || lowerQuery.includes('impressive')) {
+      return {
+        answer: "**Impressive Hutech Solutions Stats:**\n\n🎯 **500+** Successful projects delivered\n👥 **150+** Expert developers and consultants\n🌍 **25+** Countries served worldwide\n⭐ **98%** Client satisfaction rate\n🚀 **50+** Fortune 500 companies served\n💡 **8+ years** Average team experience\n🏆 **15+** Industry awards received\n⚡ **24/7** Support availability",
+        recommendations: [
+          "What industries have you worked with?",
+          "Can you show me some case studies?",
+          "What makes Hutech Solutions different?"
+        ]
+      };
+    }
+
+    // Certifications
+    if (lowerQuery.includes('certification') || lowerQuery.includes('certified')) {
+      return {
+        answer: "**Hutech Solutions Certifications:**\n\n🏆 **ISO 27001** - Information Security Management\n☁️ **AWS Advanced Consulting Partner**\n🔵 **Microsoft Gold Partner**\n🔒 **SOC 2 Type II** Compliant\n📊 **CMMI Level 3** - Software Development\n🛡️ **Certified Ethical Hacker (CEH)**\n🎯 **Agile & Scrum Certified**\n🔐 **CISSP** - Cybersecurity expertise",
+        recommendations: [
+          "What security standards do you follow?",
+          "Are you compliant with GDPR?",
+          "Do you have PCI DSS certification?"
+        ]
+      };
+    }
+
+    // Default response
+    return {
+      answer: `Thank you for your question: "${query}"\n\nI'm here to help you learn more about Hutech Solutions! We're a leading technology company that specializes in custom software development, cloud services, and digital transformation.\n\nPlease feel free to ask me about our services, team, locations, or anything else you'd like to know.`,
+      recommendations: [
+        "Who is the founder/who is the CEO?",
+        "Where are our offices?",
+        "What services do we provide?",
+        "Give me your contact details."
+      ]
+    };
+  };
+
   const sendMessage = async (query?: string) => {
     const messageText = query || inputValue.trim();
     if (!messageText || isTransitioning) return;
