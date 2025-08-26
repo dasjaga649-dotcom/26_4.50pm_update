@@ -176,15 +176,39 @@ function App() {
     setIsLoading(true);
 
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+      // Use environment variable for API endpoint, fallback to localhost
+      const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:3001/query';
 
-      // Mock response based on user query
-      const botResponse = generateMockResponse(messageText);
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: messageText }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
+      }
+
+      const data = await response.text();
+      let botResponse: BotResponse;
+
+      try {
+        const jsonResponse = JSON.parse(data);
+        if (jsonResponse.response) {
+          botResponse = jsonResponse.response;
+        } else {
+          botResponse = { answer: data };
+        }
+      } catch (parseError) {
+        botResponse = { answer: data };
+      }
 
       const botMessage: Message = {
         id: Date.now() + 1,
-        text: botResponse.answer || "Thank you for your question! I'm here to help.",
+        text: botResponse.answer || "Sorry, I couldn't process your request.",
         isUser: false,
         timestamp: new Date(),
         response: botResponse,
@@ -194,9 +218,17 @@ function App() {
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+
+      // Provide helpful error message based on error type
+      let errorText = "Sorry, I'm having trouble connecting to the server.";
+
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        errorText = "Unable to connect to the backend server. Please check if the API server is running and accessible.";
+      }
+
       const errorMessage: Message = {
         id: Date.now() + 1,
-        text: "Sorry, I encountered an error while processing your request. Please try again.",
+        text: errorText,
         isUser: false,
         timestamp: new Date(),
         query: messageText
