@@ -1,0 +1,208 @@
+/* Modern Search Transition Animations */
+
+/* Client page transition states */
+.client-page.transitioning {
+  position: relative;
+}
+
+.client-page.transitioning::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+  animation: fadeInBackdrop 0.4s ease-out forwards;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+@keyframes fadeInBackdrop {
+  to {
+    opacity: 1;
+  }
+}
+
+.client-page.transitioning .welcome-section {
+  animation: fadeOutUp 0.6s ease-out forwards;
+}
+
+.client-page.transitioning .client-search-container.search-moving {
+  animation: searchBarMoveDown 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 1000;
+}
+
+.client-page.transitioning .question-cards-container.cards-disappearing {
+  animation: cardsDisappear 0.8s ease-out forwards;
+}
+
+/* Individual question card animations */
+.client-page.transitioning .question-card-horizontal:nth-child(odd) {
+  animation: slideOutLeft 0.8s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+.client-page.transitioning .question-card-horizontal:nth-child(even) {
+  animation: slideOutRight 0.8s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+/* Welcome section fade out animation */
+@keyframes fadeOutUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+/* Question cards slide out animations */
+@keyframes slideOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-150px) scale(0.8);
+  }
+}
+
+@keyframes slideOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(20px) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(150px) scale(0.8);
+  }
+}
+
+/* Cards container disappear */
+@keyframes cardsDisappear {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 0.2;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(40px);
+    visibility: hidden;
+  }
+}
+
+/* Search bar move down animation */
+@keyframes searchBarMoveDown {
+  0% {
+    transform: translateY(0);
+    width: 50%;
+    max-width: 600px;
+    min-width: 400px;
+    filter: blur(0px);
+  }
+  20% {
+    transform: translateY(30px) scale(1.03);
+    filter: blur(0.5px);
+  }
+  40% {
+    transform: translateY(80px) scale(1.06);
+    filter: blur(1px);
+  }
+  60% {
+    transform: translateY(150px) scale(1.04);
+    width: 45%;
+    max-width: 550px;
+    filter: blur(0.5px);
+  }
+  80% {
+    transform: translateY(250px) scale(1.01);
+    width: 42%;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translateY(300px);
+    width: 100%;
+    max-width: none;
+    min-width: auto;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    margin-left: -50%;
+    filter: blur(0px);
+  }
+}
+
+/* Chat page entrance animation */
+.page-transition-enter-active {
+  animation: chatPageSlideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+@keyframes chatPageSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth search input focus animation during transition */
+.client-page.transitioning .client-search-input {
+  animation: searchInputGlow 1.2s ease-out;
+}
+
+@keyframes searchInputGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(37, 99, 235, 0.2);
+    border-color: #2563eb;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+/* Prevent interaction during transition */
+.client-page.transitioning .client-search-input,
+.client-page.transitioning .search-send-button,
+.client-page.transitioning .question-card-horizontal {
+  pointer-events: none;
+}
+
+/* Enhance button animation during transition */
+.client-page.transitioning .search-send-button {
+  animation: buttonPulse 1.2s ease-out;
+}
+
+@keyframes buttonPulse {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.1);
+    background: #1d4ed8;
+  }
+}
