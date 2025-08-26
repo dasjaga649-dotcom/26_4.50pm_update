@@ -108,14 +108,22 @@
           border-radius: 0;
           padding: 16px 0;
           margin: 0;
+          color: #374151;
         }
 
+        .suggestion-button svg {
+          color: #9ca3af;
+          transition: color 0.2s ease-in-out;
+        }
+
+        /* Hover state - blue text and plus icon */
         .suggestion-button:hover {
+          color: #2563eb;
           background-color: #f9fafb;
         }
 
         .suggestion-button:hover svg {
-          color: #6b7280;
+          color: #2563eb;
         }
 
         /* Clicked state - blue text and plus icon */
