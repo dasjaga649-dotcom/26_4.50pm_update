@@ -175,36 +175,15 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: messageText }),
-      });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
-      }
-
-      const data = await response.text();
-      let botResponse: BotResponse;
-      
-      try {
-        const jsonResponse = JSON.parse(data);
-        if (jsonResponse.response) {
-          botResponse = jsonResponse.response;
-        } else {
-          botResponse = { answer: data };
-        }
-      } catch (parseError) {
-        botResponse = { answer: data };
-      }
+      // Mock response based on user query
+      const botResponse = generateMockResponse(messageText);
 
       const botMessage: Message = {
         id: Date.now() + 1,
-        text: botResponse.answer || "Sorry, I couldn't process your request.",
+        text: botResponse.answer || "Thank you for your question! I'm here to help.",
         isUser: false,
         timestamp: new Date(),
         response: botResponse,
@@ -216,7 +195,7 @@ function App() {
       console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: Date.now() + 1,
-        text: "Sorry, I'm having trouble connecting to the server. Please make sure your backend is running on http://localhost:3001",
+        text: "Sorry, I encountered an error while processing your request. Please try again.",
         isUser: false,
         timestamp: new Date(),
         query: messageText
