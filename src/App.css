@@ -99,19 +99,36 @@
           background-color: #fafafa;
         }
 
-        /* Styling for the suggestion buttons */
+        /* Styling for the suggestion buttons - line style */
         .suggestion-button {
           transition: all 0.2s ease-in-out;
+          border: none;
+          border-bottom: 1px solid #e5e7eb;
+          background: transparent;
+          border-radius: 0;
+          padding: 16px 0;
+          margin: 0;
         }
 
         .suggestion-button:hover {
-          background-color: #e5e7eb;
-          transform: translateY(-2px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          background-color: #f9fafb;
         }
 
         .suggestion-button:hover svg {
           color: #6b7280;
+        }
+
+        /* Clicked state - blue text and plus icon */
+        .suggestion-button.clicked {
+          color: #2563eb;
+        }
+
+        .suggestion-button.clicked svg {
+          color: #2563eb;
+        }
+
+        .suggestion-button.clicked:hover {
+          background-color: #eff6ff;
         }
 
         /* Custom carousel styling */
