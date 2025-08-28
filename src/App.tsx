@@ -154,6 +154,34 @@ function App() {
     }
   ];
 
+  // Helper function to validate and sanitize BotResponse data
+  const validateBotResponse = (response: Partial<BotResponse>): BotResponse => {
+    return {
+      answer: typeof response.answer === 'string' ? response.answer : '',
+      related_content: Array.isArray(response.related_content)
+        ? response.related_content.filter(item =>
+            item && typeof item.title === 'string' && typeof item.url === 'string'
+          )
+        : undefined,
+      recommendations: Array.isArray(response.recommendations)
+        ? response.recommendations.filter(item => typeof item === 'string')
+        : undefined,
+      file_links: Array.isArray(response.file_links)
+        ? response.file_links.filter(item =>
+            item && typeof item.title === 'string' && typeof item.url === 'string'
+          )
+        : undefined,
+      tables: Array.isArray(response.tables)
+        ? response.tables.filter(table =>
+            table &&
+            typeof table.title === 'string' &&
+            Array.isArray(table.headers) &&
+            Array.isArray(table.rows)
+          )
+        : undefined
+    };
+  };
+
   // Helper function to parse JSON responses with multiple format support
   const parseJsonResponse = (jsonData: any): BotResponse => {
     // Handle different JSON response formats
