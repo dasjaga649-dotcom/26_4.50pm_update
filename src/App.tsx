@@ -322,11 +322,27 @@ function App() {
       console.error('Error sending message:', error);
 
       // Provide helpful error message based on error type
-      let errorText = "Sorry, I'm having trouble connecting to the server.";
+      let errorText = "Sorry, I encountered an error while processing your request.";
+      let debugInfo = '';
 
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
         errorText = "Unable to connect to the backend server. Please check if the API server is running and accessible.";
+        debugInfo = 'Network connection failed';
+      } else if (error instanceof SyntaxError) {
+        errorText = "Received an invalid response format from the server.";
+        debugInfo = 'JSON parsing error';
+      } else if (error instanceof Error) {
+        errorText = `Server error: ${error.message}`;
+        debugInfo = error.message;
       }
+
+      // Log detailed error information for debugging
+      console.warn('Chat error details:', {
+        error: error,
+        message: messageText,
+        timestamp: new Date().toISOString(),
+        debugInfo: debugInfo
+      });
 
       const errorMessage: Message = {
         id: Date.now() + 1,
