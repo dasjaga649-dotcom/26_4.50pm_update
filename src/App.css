@@ -110,9 +110,9 @@
         }
 
         .header-container {
-          max-width: 1200px;
+          max-width: 1400px;
           margin: 0 auto;
-          padding: 0 1rem;
+          padding: 0 2rem;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -144,43 +144,49 @@
         .nav-item {
           background: none;
           border: none;
-          color: #374151;
+          color: #6b7280;
           font-size: 0.95rem;
           font-weight: 500;
-          padding: 0.5rem 1rem;
+          padding: 0.5rem 0;
           cursor: pointer;
           text-decoration: none;
-          border-radius: 6px;
-        }
-
-        .nav-item:hover {
-          background-color: #f3f4f6;
-          color: #1f2937;
-        }
-
-        .nav-dropdown {
           position: relative;
         }
 
-        .dropdown-trigger {
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
+        .nav-item:hover {
+          color: #374151;
+        }
+
+        .nav-item.active {
+          color: #2563eb;
         }
 
         .chat-button {
           background: #2563eb;
-          color: white;
+          color: white !important;
           font-weight: 600;
+          padding: 0.6rem 1.5rem;
+          border-radius: 6px;
+          margin-left: 1rem;
         }
 
         .chat-button:hover {
           background: #1d4ed8;
-          color: white;
+          color: white !important;
         }
 
-        .chat-button.active {
+        .chat-button.chat-active {
           background: #1d4ed8;
+          color: white !important;
+        }
+
+        /* Remove dropdown styles */
+        .nav-dropdown {
+          display: none;
+        }
+
+        .dropdown-trigger {
+          display: none;
         }
 
         /* Styling for the suggestion buttons - line style */
