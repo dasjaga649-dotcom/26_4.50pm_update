@@ -516,7 +516,7 @@ function App() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 disabled={isLoading}
-                className={`chat-search-input ${isLoading ? 'searching' : ''}`}
+                className="chat-search-input"
               />
 
               {/* Three Dots Menu Inside Input */}
