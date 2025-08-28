@@ -6,7 +6,7 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
-  const [activeItem, setActiveItem] = useState('Home');
+  const [activeItem, setActiveItem] = useState('Contact Us');
 
   const handleItemClick = (itemName: string) => {
     setActiveItem(itemName);
