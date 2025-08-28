@@ -188,24 +188,26 @@ function App() {
 
     // Format 1: { response: { answer: "...", ... } }
     if (jsonData.response && typeof jsonData.response === 'object') {
-      return {
+      const rawResponse = {
         answer: jsonData.response.answer || jsonData.response.text || '',
         related_content: jsonData.response.related_content || jsonData.response.relatedContent,
         recommendations: jsonData.response.recommendations || jsonData.response.suggestions,
         file_links: jsonData.response.file_links || jsonData.response.fileLinks || jsonData.response.files,
         tables: jsonData.response.tables
       };
+      return validateBotResponse(rawResponse);
     }
 
     // Format 2: { answer: "...", ... } (direct format)
     if (jsonData.answer || jsonData.text || jsonData.message) {
-      return {
+      const rawResponse = {
         answer: jsonData.answer || jsonData.text || jsonData.message,
         related_content: jsonData.related_content || jsonData.relatedContent,
         recommendations: jsonData.recommendations || jsonData.suggestions,
         file_links: jsonData.file_links || jsonData.fileLinks || jsonData.files,
         tables: jsonData.tables
       };
+      return validateBotResponse(rawResponse);
     }
 
     // Format 3: { data: { ... } }
@@ -220,13 +222,13 @@ function App() {
 
     // Format 5: String response wrapped in object
     if (typeof jsonData === 'string') {
-      return { answer: jsonData };
+      return validateBotResponse({ answer: jsonData });
     }
 
     // Fallback: stringify the entire object
-    return {
+    return validateBotResponse({
       answer: JSON.stringify(jsonData, null, 2)
-    };
+    });
   };
 
   // Helper function to parse text responses and detect if they contain JSON
