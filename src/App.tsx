@@ -250,9 +250,9 @@ function App() {
     // Check for common structured text patterns and convert to proper format
     const processedText = preprocessTextResponse(trimmedText);
 
-    return {
+    return validateBotResponse({
       answer: processedText
-    };
+    });
   };
 
   // Helper function to preprocess text responses for better rendering
