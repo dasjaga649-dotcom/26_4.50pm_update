@@ -102,76 +102,79 @@
         /* Main Navigation Styles */
         .main-header {
           background: #ffffff;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid #e2e8f0;
           position: sticky;
           top: 0;
           z-index: 100;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .header-container {
-          max-width: 1400px;
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 0 2rem;
+          padding: 0 1.5rem;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          height: 70px;
+          height: 80px;
         }
 
         .logo-section {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 1.5rem;
         }
 
         .hutech-logo {
-          height: 40px;
+          height: 45px;
           width: auto;
         }
 
         .cmmi-logo {
-          height: 35px;
+          height: 40px;
           width: auto;
         }
 
         .navigation-menu {
           display: flex;
           align-items: center;
-          gap: 2rem;
+          gap: 2.5rem;
         }
 
         .nav-item {
           background: none;
           border: none;
-          color: #6b7280;
-          font-size: 0.95rem;
+          color: #64748b;
+          font-size: 15px;
           font-weight: 500;
-          padding: 0.5rem 0;
+          padding: 0.75rem 0;
           cursor: pointer;
           text-decoration: none;
           position: relative;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
 
         .nav-item:hover {
-          color: #374151;
+          color: #334155;
         }
 
         .nav-item.active {
           color: #2563eb;
+          font-weight: 600;
         }
 
         .chat-button {
-          background: #2563eb;
+          background: #3b82f6;
           color: white !important;
           font-weight: 600;
-          padding: 0.6rem 1.5rem;
-          border-radius: 6px;
-          margin-left: 1rem;
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          margin-left: 1.5rem;
+          font-size: 14px;
         }
 
         .chat-button:hover {
-          background: #1d4ed8;
+          background: #2563eb;
           color: white !important;
         }
 
