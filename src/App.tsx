@@ -1124,7 +1124,11 @@ const BotMessage: React.FC<{
         {message.text && (
           <div className="p-4 rounded-xl prose text-gray-800">
             <div dangerouslySetInnerHTML={{
-              __html: marked(renderIcons(renderTables(preprocessResponse(message.text), response?.tables || []))) as string
+              __html: safeRenderMarkdown(
+                renderIcons(
+                  renderTables(message.text, response?.tables || [])
+                )
+              )
             }} />
           </div>
         )}
