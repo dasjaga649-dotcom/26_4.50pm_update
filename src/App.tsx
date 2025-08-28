@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
 import './App.css';
+import Navigation from './components/Navigation';
 
 // Configure marked for better rendering and security
 marked.setOptions({
