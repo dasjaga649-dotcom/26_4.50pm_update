@@ -2,9 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
 import './App.css';
 
-// Configure marked to return strings synchronously
+// Configure marked for better rendering and security
 marked.setOptions({
-  async: false
+  async: false,
+  breaks: true, // Convert line breaks to <br>
+  gfm: true, // GitHub Flavored Markdown
+  sanitize: false, // We'll handle HTML sanitization manually if needed
+  smartLists: true,
+  smartypants: true, // Smart quotes and dashes
+  tables: true // Enable table support
 });
 
 interface Message {
