@@ -463,7 +463,7 @@ function App() {
           </div>
 
           {/* Question Cards - Horizontal Scroll */}
-          <div className={`question-cards-container ${isTransitioning ? 'cards-disappearing' : ''}`}>
+          <div className="question-cards-container">
             <div className="question-cards-scroll">
               {questionCards.map((card, index) => (
                 <div
