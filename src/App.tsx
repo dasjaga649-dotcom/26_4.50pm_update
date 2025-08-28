@@ -439,7 +439,7 @@ function App() {
           </div>
 
           {/* Search Bar */}
-          <div className={`client-search-container ${isTransitioning ? 'search-moving' : ''}`}>
+          <div className="client-search-container">
             <form onSubmit={handleFormSubmit} className="client-search-form">
               <div className="search-input-wrapper">
                 <input
@@ -448,12 +448,11 @@ function App() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   className="client-search-input"
-                  disabled={isTransitioning}
                 />
                 <button
                   type="submit"
                   className="search-send-button"
-                  disabled={!inputValue.trim() || isTransitioning}
+                  disabled={!inputValue.trim()}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 713.27 20.876L5.999 12zm0 0h7.5" />
