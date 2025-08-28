@@ -148,6 +148,104 @@ function App() {
     }
   ];
 
+  // Helper function to parse JSON responses with multiple format support
+  const parseJsonResponse = (jsonData: any): BotResponse => {
+    // Handle different JSON response formats
+
+    // Format 1: { response: { answer: "...", ... } }
+    if (jsonData.response && typeof jsonData.response === 'object') {
+      return {
+        answer: jsonData.response.answer || jsonData.response.text || '',
+        related_content: jsonData.response.related_content || jsonData.response.relatedContent,
+        recommendations: jsonData.response.recommendations || jsonData.response.suggestions,
+        file_links: jsonData.response.file_links || jsonData.response.fileLinks || jsonData.response.files,
+        tables: jsonData.response.tables
+      };
+    }
+
+    // Format 2: { answer: "...", ... } (direct format)
+    if (jsonData.answer || jsonData.text || jsonData.message) {
+      return {
+        answer: jsonData.answer || jsonData.text || jsonData.message,
+        related_content: jsonData.related_content || jsonData.relatedContent,
+        recommendations: jsonData.recommendations || jsonData.suggestions,
+        file_links: jsonData.file_links || jsonData.fileLinks || jsonData.files,
+        tables: jsonData.tables
+      };
+    }
+
+    // Format 3: { data: { ... } }
+    if (jsonData.data && typeof jsonData.data === 'object') {
+      return parseJsonResponse(jsonData.data);
+    }
+
+    // Format 4: Array format [{ answer: "..." }]
+    if (Array.isArray(jsonData) && jsonData.length > 0) {
+      return parseJsonResponse(jsonData[0]);
+    }
+
+    // Format 5: String response wrapped in object
+    if (typeof jsonData === 'string') {
+      return { answer: jsonData };
+    }
+
+    // Fallback: stringify the entire object
+    return {
+      answer: JSON.stringify(jsonData, null, 2)
+    };
+  };
+
+  // Helper function to parse text responses and detect if they contain JSON
+  const parseTextResponse = (textData: string): BotResponse => {
+    const trimmedText = textData.trim();
+
+    // Check if the text might be JSON
+    if ((trimmedText.startsWith('{') && trimmedText.endsWith('}')) ||
+        (trimmedText.startsWith('[') && trimmedText.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(trimmedText);
+        return parseJsonResponse(parsed);
+      } catch (e) {
+        // If JSON parsing fails, treat as markdown/text
+        console.warn('Text looks like JSON but failed to parse:', e);
+      }
+    }
+
+    // Check for common structured text patterns and convert to proper format
+    const processedText = preprocessTextResponse(trimmedText);
+
+    return {
+      answer: processedText
+    };
+  };
+
+  // Helper function to preprocess text responses for better rendering
+  const preprocessTextResponse = (text: string): string => {
+    // Handle common formatting patterns
+    let processed = text;
+
+    // Convert **bold** to proper markdown
+    processed = processed.replace(/\*\*(.*?)\*\*/g, '**$1**');
+
+    // Convert __bold__ to proper markdown
+    processed = processed.replace(/__(.*?)__/g, '**$1**');
+
+    // Convert *italic* to proper markdown
+    processed = processed.replace(/\*(.*?)\*/g, '*$1*');
+
+    // Fix line breaks and spacing
+    processed = processed.replace(/\\n/g, '\n');
+    processed = processed.replace(/\n\s*\n\s*\n/g, '\n\n');
+
+    // Handle lists that might not be properly formatted
+    processed = processed.replace(/^(\s*)[-*+]\s/gm, '$1- ');
+    processed = processed.replace(/^(\s*)(\d+)\.\s/gm, '$1$2. ');
+
+    // Handle headers that might not have proper spacing
+    processed = processed.replace(/^(#+)(\S)/gm, '$1 $2');
+
+    return processed.trim();
+  };
 
   const sendMessage = async (query?: string) => {
     const messageText = query || inputValue.trim();
