@@ -1353,6 +1353,28 @@ const SuggestionsSection: React.FC<{
 };
 
 // Utility functions
+const safeRenderMarkdown = (content: string): string => {
+  try {
+    // Process the content through our preprocessing pipeline
+    const processed = preprocessResponse(content);
+
+    // Convert to HTML using marked
+    const html = marked(processed) as string;
+
+    // Basic XSS protection - remove dangerous attributes and scripts
+    const safeHtml = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+="[^"]*"/gi, '')
+      .replace(/on\w+='[^']*'/gi, '');
+
+    return safeHtml;
+  } catch (error) {
+    console.error('Error rendering markdown:', error);
+    return content; // Fallback to plain text
+  }
+};
+
 const renderTables = (answer: string, tables: Table[]): string => {
   if (!tables || tables.length === 0) {
     return answer;
