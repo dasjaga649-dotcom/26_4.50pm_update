@@ -431,10 +431,10 @@ function App() {
         <main className="client-main">
           <div className="welcome-section">
             <h1 className="welcome-title">
-              Hello, this is an <span className="ai-text">AI assistant</span>!
+              Your AI Partner, <span className="husqy-text">Husqy</span>.
             </h1>
             <p className="welcome-subtitle">
-              I will help you find answers to your questions. Here are some examples:
+              I'm here to help you explore Hutech Solutions' cutting-edge technology and IT services. Whether you're curious about our cutting-edge technology or need details on our IT services, feel free to ask.
             </p>
           </div>
 
