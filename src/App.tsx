@@ -425,31 +425,7 @@ function App() {
   if (currentPage === 'client') {
     return (
       <div className="client-page">
-        {/* Header */}
-        <header className="client-header">
-          <div className="header-content">
-            <div className="logo-section">
-              <img
-                src="https://hutechsolutions.com/wp-content/uploads/2024/08/hutech-logo-1.svg"
-                alt="Hutech Solutions"
-                className="hutech-logo"
-              />
-              <img
-                src="https://hutechsolutions.com/wp-content/uploads/2024/08/cmmi-level3-logo.svg"
-                alt="CMMI Level 3"
-                className="cmmi-logo"
-              />
-            </div>
-            <nav className="nav-menu">
-              <button className="nav-button active">Home</button>
-              <button className="nav-button">Features</button>
-              <button className="nav-button">Services</button>
-              <button className="nav-button">About</button>
-              <button className="nav-button">Contact</button>
-              <button className="nav-button chat-nav-button">💬 Chat</button>
-            </nav>
-          </div>
-        </header>
+        <Navigation currentPage={currentPage} onNavigate={handleNavigation} />
 
         {/* Main Content */}
         <main className="client-main">
