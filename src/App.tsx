@@ -417,6 +417,11 @@ function App() {
     setShowMenu(false);
   };
 
+  const handleNavigation = (page: 'client' | 'chat') => {
+    setCurrentPage(page);
+    setShowMenu(false);
+  };
+
   if (currentPage === 'client') {
     return (
       <div className={`client-page ${isTransitioning ? 'transitioning' : ''}`}>
