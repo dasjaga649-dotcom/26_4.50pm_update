@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
 import './App.css';
+import Navigation from './components/Navigation';
 
-// Configure marked to return strings synchronously
+// Configure marked for better rendering and security
 marked.setOptions({
-  async: false
+  async: false,
+  breaks: true, // Convert line breaks to <br>
+  gfm: true, // GitHub Flavored Markdown
+  sanitize: false, // We'll handle HTML sanitization manually if needed
+  smartLists: true,
+  smartypants: true, // Smart quotes and dashes
+  tables: true // Enable table support
 });
 
 interface Message {
@@ -60,10 +67,7 @@ function App() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState<'client' | 'chat'>('client');
-  const [isSearching, setIsSearching] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [searchInitiated, setSearchInitiated] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages are added
@@ -148,20 +152,141 @@ function App() {
     }
   ];
 
+  // Helper function to validate and sanitize BotResponse data
+  const validateBotResponse = (response: Partial<BotResponse>): BotResponse => {
+    return {
+      answer: typeof response.answer === 'string' ? response.answer : '',
+      related_content: Array.isArray(response.related_content)
+        ? response.related_content.filter(item =>
+            item && typeof item.title === 'string' && typeof item.url === 'string'
+          )
+        : undefined,
+      recommendations: Array.isArray(response.recommendations)
+        ? response.recommendations.filter(item => typeof item === 'string')
+        : undefined,
+      file_links: Array.isArray(response.file_links)
+        ? response.file_links.filter(item =>
+            item && typeof item.title === 'string' && typeof item.url === 'string'
+          )
+        : undefined,
+      tables: Array.isArray(response.tables)
+        ? response.tables.filter(table =>
+            table &&
+            typeof table.title === 'string' &&
+            Array.isArray(table.headers) &&
+            Array.isArray(table.rows)
+          )
+        : undefined
+    };
+  };
+
+  // Helper function to parse JSON responses with multiple format support
+  const parseJsonResponse = (jsonData: any): BotResponse => {
+    // Handle different JSON response formats
+
+    // Format 1: { response: { answer: "...", ... } }
+    if (jsonData.response && typeof jsonData.response === 'object') {
+      const rawResponse = {
+        answer: jsonData.response.answer || jsonData.response.text || '',
+        related_content: jsonData.response.related_content || jsonData.response.relatedContent,
+        recommendations: jsonData.response.recommendations || jsonData.response.suggestions,
+        file_links: jsonData.response.file_links || jsonData.response.fileLinks || jsonData.response.files,
+        tables: jsonData.response.tables
+      };
+      return validateBotResponse(rawResponse);
+    }
+
+    // Format 2: { answer: "...", ... } (direct format)
+    if (jsonData.answer || jsonData.text || jsonData.message) {
+      const rawResponse = {
+        answer: jsonData.answer || jsonData.text || jsonData.message,
+        related_content: jsonData.related_content || jsonData.relatedContent,
+        recommendations: jsonData.recommendations || jsonData.suggestions,
+        file_links: jsonData.file_links || jsonData.fileLinks || jsonData.files,
+        tables: jsonData.tables
+      };
+      return validateBotResponse(rawResponse);
+    }
+
+    // Format 3: { data: { ... } }
+    if (jsonData.data && typeof jsonData.data === 'object') {
+      return parseJsonResponse(jsonData.data);
+    }
+
+    // Format 4: Array format [{ answer: "..." }]
+    if (Array.isArray(jsonData) && jsonData.length > 0) {
+      return parseJsonResponse(jsonData[0]);
+    }
+
+    // Format 5: String response wrapped in object
+    if (typeof jsonData === 'string') {
+      return validateBotResponse({ answer: jsonData });
+    }
+
+    // Fallback: stringify the entire object
+    return validateBotResponse({
+      answer: JSON.stringify(jsonData, null, 2)
+    });
+  };
+
+  // Helper function to parse text responses and detect if they contain JSON
+  const parseTextResponse = (textData: string): BotResponse => {
+    const trimmedText = textData.trim();
+
+    // Check if the text might be JSON
+    if ((trimmedText.startsWith('{') && trimmedText.endsWith('}')) ||
+        (trimmedText.startsWith('[') && trimmedText.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(trimmedText);
+        return parseJsonResponse(parsed);
+      } catch (e) {
+        // If JSON parsing fails, treat as markdown/text
+        console.warn('Text looks like JSON but failed to parse:', e);
+      }
+    }
+
+    // Check for common structured text patterns and convert to proper format
+    const processedText = preprocessTextResponse(trimmedText);
+
+    return validateBotResponse({
+      answer: processedText
+    });
+  };
+
+  // Helper function to preprocess text responses for better rendering
+  const preprocessTextResponse = (text: string): string => {
+    // Handle common formatting patterns
+    let processed = text;
+
+    // Convert **bold** to proper markdown
+    processed = processed.replace(/\*\*(.*?)\*\*/g, '**$1**');
+
+    // Convert __bold__ to proper markdown
+    processed = processed.replace(/__(.*?)__/g, '**$1**');
+
+    // Convert *italic* to proper markdown
+    processed = processed.replace(/\*(.*?)\*/g, '*$1*');
+
+    // Fix line breaks and spacing
+    processed = processed.replace(/\\n/g, '\n');
+    processed = processed.replace(/\n\s*\n\s*\n/g, '\n\n');
+
+    // Handle lists that might not be properly formatted
+    processed = processed.replace(/^(\s*)[-*+]\s/gm, '$1- ');
+    processed = processed.replace(/^(\s*)(\d+)\.\s/gm, '$1$2. ');
+
+    // Handle headers that might not have proper spacing
+    processed = processed.replace(/^(#+)(\S)/gm, '$1 $2');
+
+    return processed.trim();
+  };
+
   const sendMessage = async (query?: string) => {
     const messageText = query || inputValue.trim();
-    if (!messageText || isTransitioning) return;
+    if (!messageText) return;
 
-    // Start the search transition animation
-    setIsTransitioning(true);
-    setSearchInitiated(true);
-
-    // Wait for animations to complete before switching to chat page
-    setTimeout(() => {
-      setCurrentPage('chat');
-      setIsSearching(true);
-      setIsTransitioning(false);
-    }, 1200); // 1.2s total animation duration
+    // Switch to chat page immediately
+    setCurrentPage('chat');
 
     const userMessage: Message = {
       id: Date.now(),
@@ -175,7 +300,10 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/query', {
+      // Use environment variable for API endpoint, fallback to localhost
+      const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:3001/query';
+
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,18 +316,22 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
       }
 
-      const data = await response.text();
+      // Try to parse as JSON first, fallback to text
       let botResponse: BotResponse;
-      
+      const contentType = response.headers.get('content-type');
+
       try {
-        const jsonResponse = JSON.parse(data);
-        if (jsonResponse.response) {
-          botResponse = jsonResponse.response;
+        if (contentType && contentType.includes('application/json')) {
+          const jsonData = await response.json();
+          botResponse = parseJsonResponse(jsonData);
         } else {
-          botResponse = { answer: data };
+          const textData = await response.text();
+          botResponse = parseTextResponse(textData);
         }
       } catch (parseError) {
-        botResponse = { answer: data };
+        console.warn('Failed to parse response, using fallback:', parseError);
+        const fallbackText = await response.text().catch(() => 'Failed to get response');
+        botResponse = { answer: fallbackText };
       }
 
       const botMessage: Message = {
@@ -214,9 +346,33 @@ function App() {
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+
+      // Provide helpful error message based on error type
+      let errorText = "Sorry, I encountered an error while processing your request.";
+      let debugInfo = '';
+
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        errorText = "Unable to connect to the backend server. Please check if the API server is running and accessible.";
+        debugInfo = 'Network connection failed';
+      } else if (error instanceof SyntaxError) {
+        errorText = "Received an invalid response format from the server.";
+        debugInfo = 'JSON parsing error';
+      } else if (error instanceof Error) {
+        errorText = `Server error: ${error.message}`;
+        debugInfo = error.message;
+      }
+
+      // Log detailed error information for debugging
+      console.warn('Chat error details:', {
+        error: error,
+        message: messageText,
+        timestamp: new Date().toISOString(),
+        debugInfo: debugInfo
+      });
+
       const errorMessage: Message = {
         id: Date.now() + 1,
-        text: "Sorry, I'm having trouble connecting to the server. Please make sure your backend is running on http://localhost:3001",
+        text: errorText,
         isUser: false,
         timestamp: new Date(),
         query: messageText
@@ -261,48 +417,29 @@ function App() {
     setShowMenu(false);
   };
 
+  const handleNavigation = (page: 'client' | 'chat') => {
+    setCurrentPage(page);
+    setShowMenu(false);
+  };
+
   if (currentPage === 'client') {
     return (
-      <div className={`client-page ${isTransitioning ? 'transitioning' : ''}`}>
-        {/* Header */}
-        <header className="client-header">
-          <div className="header-content">
-            <div className="logo-section">
-              <img
-                src="https://hutechsolutions.com/wp-content/uploads/2024/08/hutech-logo-1.svg"
-                alt="Hutech Solutions"
-                className="hutech-logo"
-              />
-              <img
-                src="https://hutechsolutions.com/wp-content/uploads/2024/08/cmmi-level3-logo.svg"
-                alt="CMMI Level 3"
-                className="cmmi-logo"
-              />
-            </div>
-            <nav className="nav-menu">
-              <button className="nav-button active">Home</button>
-              <button className="nav-button">Features</button>
-              <button className="nav-button">Services</button>
-              <button className="nav-button">About</button>
-              <button className="nav-button">Contact</button>
-              <button className="nav-button chat-nav-button">💬 Chat</button>
-            </nav>
-          </div>
-        </header>
+      <div className="client-page">
+        <Navigation currentPage={currentPage} onNavigate={handleNavigation} />
 
         {/* Main Content */}
         <main className="client-main">
           <div className="welcome-section">
             <h1 className="welcome-title">
-              Hello, this is an <span className="ai-text">AI assistant</span>!
+              Your AI Partner, <span className="husqy-text">Husqy</span>.
             </h1>
             <p className="welcome-subtitle">
-              I will help you find answers to your questions. Here are some examples:
+              I'm here to help you explore Hutech Solutions' cutting-edge technology and IT services. Whether you're curious about our cutting-edge technology or need details on our IT services, feel free to ask.
             </p>
           </div>
 
           {/* Search Bar */}
-          <div className={`client-search-container ${isTransitioning ? 'search-moving' : ''}`}>
+          <div className="client-search-container">
             <form onSubmit={handleFormSubmit} className="client-search-form">
               <div className="search-input-wrapper">
                 <input
@@ -311,12 +448,11 @@ function App() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   className="client-search-input"
-                  disabled={isTransitioning}
                 />
                 <button
                   type="submit"
                   className="search-send-button"
-                  disabled={!inputValue.trim() || isTransitioning}
+                  disabled={!inputValue.trim()}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 713.27 20.876L5.999 12zm0 0h7.5" />
@@ -327,7 +463,7 @@ function App() {
           </div>
 
           {/* Question Cards - Horizontal Scroll */}
-          <div className={`question-cards-container ${isTransitioning ? 'cards-disappearing' : ''}`}>
+          <div className="question-cards-container">
             <div className="question-cards-scroll">
               {questionCards.map((card, index) => (
                 <div
@@ -351,7 +487,8 @@ function App() {
 
   // Chat Page
   return (
-    <div className={`bg-white body ${searchInitiated ? 'page-transition-enter-active' : ''} ${isSearching ? 'chat-searching' : ''}`} id='body'>
+    <div className="bg-white body" id='body'>
+      <Navigation currentPage={currentPage} onNavigate={handleNavigation} />
       {/* Chat History Panel */}
       <div id="chat-history" className="chat-history-container">
         {messages.map((message) => (
@@ -379,7 +516,7 @@ function App() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 disabled={isLoading}
-                className={`chat-search-input ${isLoading ? 'searching' : ''}`}
+                className="chat-search-input"
               />
 
               {/* Three Dots Menu Inside Input */}
@@ -398,14 +535,10 @@ function App() {
               <button
                 type="submit"
                 disabled={isLoading || !inputValue.trim()}
-                className={`chat-send-button ${isLoading ? 'searching' : ''}`}
+                className="chat-send-button"
               >
                 {isLoading ? (
-                  <div className="searching-animation">
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                  </div>
+                  <span>...</span>
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
@@ -988,13 +1121,17 @@ const BotMessage: React.FC<{
         {message.text && (
           <div className="p-4 rounded-xl prose text-gray-800">
             <div dangerouslySetInnerHTML={{
-              __html: marked(renderIcons(renderTables(preprocessResponse(message.text), response?.tables || []))) as string
+              __html: safeRenderMarkdown(
+                renderIcons(
+                  renderTables(message.text, response?.tables || [])
+                )
+              )
             }} />
           </div>
         )}
 
-        {/* Action Buttons */}
-        {message.text && (
+        {/* Action Buttons - Hide for welcome message */}
+        {message.text && message.id !== 1 && (
           <MessageActions message={message} />
         )}
 
@@ -1181,29 +1318,64 @@ const FileLinksSection: React.FC<{ files: FileLink[] }> = ({ files }) => {
   );
 };
 
-const SuggestionsSection: React.FC<{ 
-  suggestions: string[]; 
+const SuggestionsSection: React.FC<{
+  suggestions: string[];
   onSuggestionClick: (suggestion: string) => void;
 }> = ({ suggestions, onSuggestionClick }) => {
+  const [clickedSuggestions, setClickedSuggestions] = useState<Set<string>>(new Set());
+
+  const handleSuggestionClick = (suggestion: string) => {
+    // Mark this suggestion as clicked
+    setClickedSuggestions(prev => new Set(prev.add(suggestion)));
+    // Call the original click handler
+    onSuggestionClick(suggestion);
+  };
+
   return (
     <div className="mt-6">
-      <h5 className="font-semibold text-gray-800 mb-2 px-4">Suggested Questions</h5>
-      {suggestions.map((suggestion, index) => (
-        <button
-          key={index}
-          onClick={() => onSuggestionClick(suggestion)}
-          className="suggestion-button flex items-center justify-between w-full text-left p-4 my-2 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-700 shadow-sm hover:bg-gray-100">
-          <span>{suggestion}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-gray-400">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-        </button>
-      ))}
+      <h5 className="font-semibold text-gray-800 mb-3 px-4">Suggested Questions</h5>
+      <div className="px-4">
+        {suggestions.map((suggestion, index) => (
+          <button
+            key={index}
+            onClick={() => handleSuggestionClick(suggestion)}
+            className={`suggestion-button flex items-center justify-between w-full text-left text-sm ${
+              clickedSuggestions.has(suggestion) ? 'clicked' : 'text-gray-700'
+            }`}>
+            <span>{suggestion}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
 
 // Utility functions
+const safeRenderMarkdown = (content: string): string => {
+  try {
+    // Process the content through our preprocessing pipeline
+    const processed = preprocessResponse(content);
+
+    // Convert to HTML using marked
+    const html = marked(processed) as string;
+
+    // Basic XSS protection - remove dangerous attributes and scripts
+    const safeHtml = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+="[^"]*"/gi, '')
+      .replace(/on\w+='[^']*'/gi, '');
+
+    return safeHtml;
+  } catch (error) {
+    console.error('Error rendering markdown:', error);
+    return content; // Fallback to plain text
+  }
+};
+
 const renderTables = (answer: string, tables: Table[]): string => {
   if (!tables || tables.length === 0) {
     return answer;

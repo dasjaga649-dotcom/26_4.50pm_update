@@ -99,19 +99,222 @@
           background-color: #fafafa;
         }
 
-        /* Styling for the suggestion buttons */
-        .suggestion-button {
-          transition: all 0.2s ease-in-out;
+        /* Main Navigation Styles */
+        .main-header {
+          background: #ffffff;
+          border-bottom: 1px solid #e2e8f0;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
+        .header-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 80px;
+        }
+
+        .logo-section {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .hutech-logo {
+          height: 45px;
+          width: auto;
+        }
+
+        .cmmi-logo {
+          height: 40px;
+          width: auto;
+        }
+
+        .navigation-menu {
+          display: flex;
+          align-items: center;
+          gap: 2.5rem;
+        }
+
+        .nav-item {
+          background: none;
+          border: none;
+          color: #64748b;
+          font-size: 15px;
+          font-weight: 500;
+          padding: 0.75rem 0;
+          cursor: pointer;
+          text-decoration: none;
+          position: relative;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .nav-item:hover {
+          color: #334155;
+        }
+
+        .nav-item.active {
+          color: #2563eb;
+          font-weight: 600;
+        }
+
+        .chat-button {
+          background: #3b82f6;
+          color: white !important;
+          font-weight: 600;
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          margin-left: 1.5rem;
+          font-size: 14px;
+        }
+
+        .chat-button:hover {
+          background: #2563eb;
+          color: white !important;
+        }
+
+        .chat-button.chat-active {
+          background: #1d4ed8;
+          color: white !important;
+        }
+
+        /* Remove dropdown styles */
+        .nav-dropdown {
+          display: none;
+        }
+
+        .dropdown-trigger {
+          display: none;
+        }
+
+        /* Responsive Navigation */
+        @media (max-width: 1024px) {
+          .navigation-menu {
+            gap: 1.5rem;
+          }
+
+          .nav-item {
+            font-size: 14px;
+          }
+
+          .chat-button {
+            padding: 0.6rem 1.2rem;
+            margin-left: 1rem;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .header-container {
+            padding: 0 1rem;
+            height: 70px;
+          }
+
+          .navigation-menu {
+            gap: 1rem;
+          }
+
+          .nav-item {
+            font-size: 13px;
+            padding: 0.5rem 0;
+          }
+
+          .hutech-logo {
+            height: 35px;
+          }
+
+          .cmmi-logo {
+            height: 30px;
+          }
+
+          .chat-button {
+            padding: 0.5rem 1rem;
+            font-size: 13px;
+          }
+        }
+
+        /* Welcome Section Styles */
+        .welcome-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1f2937;
+          text-align: center;
+          margin-bottom: 1rem;
+          line-height: 1.2;
+        }
+
+        .welcome-subtitle {
+          font-size: 1.125rem;
+          color: #6b7280;
+          text-align: center;
+          margin-bottom: 2rem;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
+          line-height: 1.6;
+        }
+
+        /* Gradient text for Husqy */
+        .husqy-text {
+          background: linear-gradient(90deg, #1192EE 10%, #FF9D00 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 800;
+        }
+
+        /* Client page main section */
+        .client-main {
+          padding: 3rem 1rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .welcome-section {
+          margin-bottom: 3rem;
+        }
+
+        /* Styling for the suggestion buttons - line style */
+        .suggestion-button {
+          border: none;
+          border-bottom: 1px solid #e5e7eb;
+          background: transparent;
+          border-radius: 0;
+          padding: 16px 0;
+          margin: 0;
+          color: #374151;
+        }
+
+        .suggestion-button svg {
+          color: #9ca3af;
+          transition: color 0.2s ease-in-out;
+        }
+
+        /* Hover state - blue text and plus icon */
         .suggestion-button:hover {
-          background-color: #e5e7eb;
-          transform: translateY(-2px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          color: #2563eb;
+          background-color: #f9fafb;
         }
 
         .suggestion-button:hover svg {
-          color: #6b7280;
+          color: #2563eb;
+        }
+
+        /* Clicked state - blue text and plus icon */
+        .suggestion-button.clicked {
+          color: #2563eb;
+        }
+
+        .suggestion-button.clicked svg {
+          color: #2563eb;
+        }
+
+        .suggestion-button.clicked:hover {
+          background-color: #eff6ff;
         }
 
         /* Custom carousel styling */
