@@ -192,18 +192,22 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
       }
 
-      const data = await response.text();
+      // Try to parse as JSON first, fallback to text
       let botResponse: BotResponse;
+      const contentType = response.headers.get('content-type');
 
       try {
-        const jsonResponse = JSON.parse(data);
-        if (jsonResponse.response) {
-          botResponse = jsonResponse.response;
+        if (contentType && contentType.includes('application/json')) {
+          const jsonData = await response.json();
+          botResponse = parseJsonResponse(jsonData);
         } else {
-          botResponse = { answer: data };
+          const textData = await response.text();
+          botResponse = parseTextResponse(textData);
         }
       } catch (parseError) {
-        botResponse = { answer: data };
+        console.warn('Failed to parse response, using fallback:', parseError);
+        const fallbackText = await response.text().catch(() => 'Failed to get response');
+        botResponse = { answer: fallbackText };
       }
 
       const botMessage: Message = {
