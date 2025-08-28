@@ -535,7 +535,7 @@ function App() {
               <button
                 type="submit"
                 disabled={isLoading || !inputValue.trim()}
-                className={`chat-send-button ${isLoading ? 'searching' : ''}`}
+                className="chat-send-button"
               >
                 {isLoading ? (
                   <div className="searching-animation">
