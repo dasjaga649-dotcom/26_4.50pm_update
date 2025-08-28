@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface NavigationProps {
   currentPage: 'client' | 'chat';
@@ -6,6 +6,12 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
+  const [activeItem, setActiveItem] = useState('Home');
+
+  const handleItemClick = (itemName: string) => {
+    setActiveItem(itemName);
+  };
+
   return (
     <header className="main-header">
       <div className="header-container">
@@ -22,28 +28,60 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
           />
         </div>
         <nav className="navigation-menu">
-          <button className="nav-item">Home</button>
-          <div className="nav-dropdown">
-            <button className="nav-item dropdown-trigger">
-              Company ▼
-            </button>
-          </div>
-          <div className="nav-dropdown">
-            <button className="nav-item dropdown-trigger">
-              Services ▼
-            </button>
-          </div>
-          <div className="nav-dropdown">
-            <button className="nav-item dropdown-trigger">
-              Industries ▼
-            </button>
-          </div>
-          <button className="nav-item">Blogs</button>
-          <button className="nav-item">Careers</button>
-          <button className="nav-item">Case Studies</button>
-          <button 
-            className={`nav-item chat-button ${currentPage === 'chat' ? 'active' : ''}`}
-            onClick={() => onNavigate(currentPage === 'chat' ? 'client' : 'chat')}
+          <button
+            className={`nav-item ${activeItem === 'Home' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Home')}
+          >
+            Home
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Company' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Company')}
+          >
+            Company
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Services' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Services')}
+          >
+            Services
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Industries' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Industries')}
+          >
+            Industries
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Blogs' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Blogs')}
+          >
+            Blogs
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Careers' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Careers')}
+          >
+            Careers
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Case Studies' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Case Studies')}
+          >
+            Case Studies
+          </button>
+          <button
+            className={`nav-item ${activeItem === 'Contact Us' ? 'active' : ''}`}
+            onClick={() => handleItemClick('Contact Us')}
+          >
+            Contact Us
+          </button>
+          <button
+            className={`nav-item chat-button ${currentPage === 'chat' ? 'chat-active' : ''}`}
+            onClick={() => {
+              handleItemClick('Chat');
+              onNavigate(currentPage === 'chat' ? 'client' : 'chat');
+            }}
           >
             Chat
           </button>
