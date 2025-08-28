@@ -99,9 +99,92 @@
           background-color: #fafafa;
         }
 
+        /* Main Navigation Styles */
+        .main-header {
+          background: #ffffff;
+          border-bottom: 1px solid #e5e7eb;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 70px;
+        }
+
+        .logo-section {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hutech-logo {
+          height: 40px;
+          width: auto;
+        }
+
+        .cmmi-logo {
+          height: 35px;
+          width: auto;
+        }
+
+        .navigation-menu {
+          display: flex;
+          align-items: center;
+          gap: 2rem;
+        }
+
+        .nav-item {
+          background: none;
+          border: none;
+          color: #374151;
+          font-size: 0.95rem;
+          font-weight: 500;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          text-decoration: none;
+          border-radius: 6px;
+        }
+
+        .nav-item:hover {
+          background-color: #f3f4f6;
+          color: #1f2937;
+        }
+
+        .nav-dropdown {
+          position: relative;
+        }
+
+        .dropdown-trigger {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+        }
+
+        .chat-button {
+          background: #2563eb;
+          color: white;
+          font-weight: 600;
+        }
+
+        .chat-button:hover {
+          background: #1d4ed8;
+          color: white;
+        }
+
+        .chat-button.active {
+          background: #1d4ed8;
+        }
+
         /* Styling for the suggestion buttons - line style */
         .suggestion-button {
-          transition: all 0.2s ease-in-out;
           border: none;
           border-bottom: 1px solid #e5e7eb;
           background: transparent;
