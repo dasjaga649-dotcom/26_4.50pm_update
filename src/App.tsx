@@ -1005,8 +1005,8 @@ const BotMessage: React.FC<{
           </div>
         )}
 
-        {/* Action Buttons */}
-        {message.text && (
+        {/* Action Buttons - Hide for welcome message */}
+        {message.text && message.id !== 1 && (
           <MessageActions message={message} />
         )}
 
