@@ -424,7 +424,7 @@ function App() {
 
   if (currentPage === 'client') {
     return (
-      <div className={`client-page ${isTransitioning ? 'transitioning' : ''}`}>
+      <div className="client-page">
         {/* Header */}
         <header className="client-header">
           <div className="header-content">
